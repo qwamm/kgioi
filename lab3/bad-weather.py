@@ -16,8 +16,20 @@ def bw(img, drawable, blur, brightAdjust, contrastAdjust):
     # desaturate and colorize the new layer
     # pdb.gimp_desaturate_full(copyLayer1, 1)
     # pdb.gimp_colorize(copyLayer1, 215, 11, 0)
+    width, height = copyLayer1.width, copyLayer1.height
+    out_pixel = pdb.gimp_drawable_get_pixel(copyLayer1, 0, 0)
+    for i in range(height):
+        for j in range(width):
+            in_pixel = pdb.gimp_drawable_get_pixel(copyLayer1, j, i)[1]
+            r, g, b, alpha = in_pixel[0], in_pixel[1], in_pixel[2], in_pixel[3]
+            out_r = (r - 0.5) * contrastAdjust + brightAdjust + 0.5
+            out_g = (g - 0.5) * contrastAdjust + brightAdjust + 0.5
+            out_b = (b - 0.5) * contrastAdjust + brightAdjust + 0.5
+            out_alpha = alpha; #copy alpha
+            out_pixel = (out_r, out_g, out_b, out_alpha)
+            pdb.gimp_drawable_set_pixel(copyLayer1, j, i, 4, out_pixel)
 
-    pdb.gimp_drawable_brightness_contrast(copyLayer1, brightAdjust, contrastAdjust)
+    #pdb.gimp_drawable_brightness_contrast(copyLayer1, brightAdjust, contrastAdjust)
 
     # blur the shadow layer
     pdb.plug_in_gauss_iir(img, copyLayer1, blur, True, True)
